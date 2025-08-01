@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Useless Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: black;
+            color: red;
+            font-family: Impact, Arial Black, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .title {
+            font-size: 80px;
+            font-weight: 900;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+        
+        .timer-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .timer-box {
+            background-color: red;
+            color: black;
+            padding: 40px;
+            text-align: center;
+            min-width: 200px;
+        }
+        
+        .timer-number {
+            font-size: 100px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        
+        .timer-label {
+            font-size: 24px;
+            font-weight: 900;
+        }
+        
+        .finished {
+            font-size: 120px;
+            font-weight: 900;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .title { font-size: 60px; }
+            .timer-number { font-size: 80px; }
+            .timer-box { padding: 30px; min-width: 150px; }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">USELESS TIMER</h1>
+    
+    <div id="timer-display" class="timer-container">
+        <div class="timer-box">
+            <div id="hours" class="timer-number">00</div>
+            <div class="timer-label">HOURS</div>
+        </div>
+        <div class="timer-box">
+            <div id="minutes" class="timer-number">00</div>
+            <div class="timer-label">MINUTES</div>
+        </div>
+        <div class="timer-box">
+            <div id="seconds" class="timer-number">00</div>
+            <div class="timer-label">SECONDS</div>
+        </div>
+    </div>
+    
+    <div id="finished" class="finished" style="display: none;">
+        TIME'S UP
+    </div>
+
+    <script>
+        function padZero(num) {
+            return num.toString().padStart(2, '0');
+        }
+        
+        function updateTimer() {
+            var now = new Date();
+            var tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(6, 0, 0, 0);
+            
+            var difference = tomorrow.getTime() - now.getTime();
+            
+            if (difference > 0) {
+                var hours = Math.floor(difference / (1000 * 60 * 60));
+                var minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((difference % (1000 * 60)) / 1000);
+                
+                document.getElementById('hours').textContent = padZero(hours);
+                document.getElementById('minutes').textContent = padZero(minutes);
+                document.getElementById('seconds').textContent = padZero(seconds);
+                
+                document.getElementById('timer-display').style.display = 'flex';
+                document.getElementById('finished').style.display = 'none';
+            } else {
+                document.getElementById('timer-display').style.display = 'none';
+                document.getElementById('finished').style.display = 'block';
+            }
+        }
+        
+        // Update immediately and then every second
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>
