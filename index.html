@@ -14,7 +14,8 @@
         body {
             background-color: black;
             color: red;
-            font-family: Impact, Arial Black, sans-serif;
+            font-family: Arial Black, Arial, sans-serif;
+            font-weight: 900;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -28,6 +29,7 @@
             font-weight: 900;
             margin-bottom: 60px;
             text-align: center;
+            letter-spacing: 4px;
         }
         
         .timer-container {
@@ -63,6 +65,18 @@
             text-align: center;
         }
         
+        .status {
+            color: red;
+            font-size: 20px;
+            margin-top: 40px;
+            text-align: center;
+            font-weight: 900;
+        }
+        
+        .real-time {
+            background-color: #ff6666 !important;
+        }
+        
         @media (max-width: 768px) {
             .title { font-size: 60px; }
             .timer-number { font-size: 80px; }
@@ -74,30 +88,39 @@
     <h1 class="title">USELESS TIMER</h1>
     
     <div id="timer-display" class="timer-container">
-        <div class="timer-box">
+        <div id="hours-box" class="timer-box">
             <div id="hours" class="timer-number">00</div>
             <div class="timer-label">MINUTES</div>
         </div>
-        <div class="timer-box">
+        <div id="minutes-box" class="timer-box">
             <div id="minutes" class="timer-number">00</div>
-            <div class="timer-label">HOURS</div>
-        </div>
-        <div class="timer-box">
-            <div id="seconds" class="timer-number">00</div>
             <div class="timer-label">SECONDS</div>
+        </div>
+        <div id="seconds-box" class="timer-box">
+            <div id="seconds" class="timer-number">00</div>
+            <div class="timer-label">HOURS</div>
         </div>
     </div>
     
     <div id="finished" class="finished" style="display: none;">
         TIME'S UP
     </div>
+    
+    <div id="status" class="status">.</div>
 
     <script>
+        var showRealTime = false;
+        var realTimeCounter = 0;
+        
         function padZero(num) {
             return num.toString().padStart(2, '0');
         }
         
-        function updateTimer() {
+        function getRandomNumber() {
+            return Math.floor(Math.random() * 60);
+        }
+        
+        function getRealCountdown() {
             var now = new Date();
             var tomorrow = new Date(now);
             tomorrow.setDate(tomorrow.getDate() + 1);
@@ -110,21 +133,77 @@
                 var minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
                 var seconds = Math.floor((difference % (1000 * 60)) / 1000);
                 
-                document.getElementById('hours').textContent = padZero(hours);
-                document.getElementById('minutes').textContent = padZero(minutes);
-                document.getElementById('seconds').textContent = padZero(seconds);
-                
-                document.getElementById('timer-display').style.display = 'flex';
-                document.getElementById('finished').style.display = 'none';
+                return {
+                    hours: hours,
+                    minutes: minutes,
+                    seconds: seconds,
+                    finished: false
+                };
             } else {
+                return {
+                    hours: 0,
+                    minutes: 0,
+                    seconds: 0,
+                    finished: true
+                };
+            }
+        }
+        
+        function updateDisplay() {
+            var countdown = getRealCountdown();
+            
+            if (countdown.finished) {
                 document.getElementById('timer-display').style.display = 'none';
                 document.getElementById('finished').style.display = 'block';
+                document.getElementById('status').style.display = 'none';
+                return;
+            }
+            
+            // Check if we should show real time (every 30 seconds)
+            realTimeCounter++;
+            if (realTimeCounter >= 30) {
+                showRealTime = true;
+                realTimeCounter = 0;
+            } else if (realTimeCounter >= 5 && showRealTime) {
+                showRealTime = false;
+            }
+            
+            var hoursBox = document.getElementById('hours-box');
+            var minutesBox = document.getElementById('minutes-box');
+            var secondsBox = document.getElementById('seconds-box');
+            var status = document.getElementById('status');
+            
+            if (showRealTime) {
+                // Show real countdown
+                document.getElementById('hours').textContent = padZero(countdown.hours);
+                document.getElementById('minutes').textContent = padZero(countdown.minutes);
+                document.getElementById('seconds').textContent = padZero(countdown.seconds);
+                
+                // Highlight boxes to show real time
+                hoursBox.className = 'timer-box real-time';
+                minutesBox.className = 'timer-box real-time';
+                secondsBox.className = 'timer-box real-time';
+                
+                status.textContent = 'SHOWING REAL TIME!';
+            } else {
+                // Show random numbers
+                document.getElementById('hours').textContent = padZero(getRandomNumber());
+                document.getElementById('minutes').textContent = padZero(getRandomNumber());
+                document.getElementById('seconds').textContent = padZero(getRandomNumber());
+                
+                // Normal box styling
+                hoursBox.className = 'timer-box';
+                minutesBox.className = 'timer-box';
+                secondsBox.className = 'timer-box';
+                
+                var timeUntilReal = 30 - realTimeCounter;
+                status.textContent = '';
             }
         }
         
         // Update immediately and then every second
-        updateTimer();
-        setInterval(updateTimer, 1000);
+        updateDisplay();
+        setInterval(updateDisplay, 1000);
     </script>
 </body>
 </html>
